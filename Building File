@@ -1,17 +1,62 @@
 def get_item_details():
   name = input("Enter item name: ")
   price = float(input("Enter price: "))
+  discount_applied = input("Apply discount (y/n)? ")
+  if discount_applied.lower() == 'y':
+    discount_type = input("Discount type (percentage/fixed amount)? ")
+    discount_value = float(input("Enter discount value: "))
+    discount = Discount(discount_type, discount_value)
+    price = discount.apply_discount(price)
+    print(f"Discount applied: ${discount.value:.2f} ({discount.type})")
   return name, price
 
 def main():
   total_price = 0
+  cart_items = []  # List to store item details (name, price)
   for i in range(1, 4):
     print(f"\nItem {i}")
     name, price = get_item_details()
+    cart_items.append({"name": name, "price": price})
     total_price += price
     print(f"Item {i} added: {name} (${price:.2f})")
+
+  print("\nTotal Price before discount:", f"${total_price:.2f}")
+
+  # Apply overall discount (optional)
+  discount_applied = input("Apply overall discount (y/n)? ")
+  if discount_applied.lower() == 'y':
+    discount_type = input("Discount type (percentage/fixed amount)? ")
+    discount_value = float(input("Enter discount value: "))
+    if discount_type == "percentage":
+      discount = total_price * (discount_value / 100)
+      total_price -= discount
+    elif discount_type == "fixed_amount":
+      total_price -= discount_value
+    else:
+      raise ValueError("Invalid discount type")
+    print(f"Overall discount applied: ${discount.value:.2f} ({discount_type})")
+
+  # Display cart items with details
+  print("\nCart Items:")
+  for item in cart_items:
+    print(f"{item['name']} (${item['price']:.2f})")
 
   print("\nTotal Price:", f"${total_price:.2f}")
 
 if __name__ == "__main__":
   main()
+
+class Discount:
+  def __init__(self, type, value):
+    self.type = type  # "percentage" or "fixed_amount"
+    self.value = value
+
+  def apply_discount(self, price):
+    if self.type == "percentage":
+      discount = price * (self.value / 100)
+      return price - discount
+    elif self.type == "fixed_amount":
+      return price - self.value
+    else:
+      raise ValueError("Invalid discount type")
+
